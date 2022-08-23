@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class List {
+export class ListEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -11,6 +11,6 @@ export class List {
 	@Column()
 	userId: string;
 
-	@Column({ default: true })
+	@Column({ default: false })
 	isActive: boolean;
 }

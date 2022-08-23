@@ -1,7 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {ListEntity} from "./list.entity";
 
 @Entity()
-export class Item {
+export class ItemEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -14,6 +15,6 @@ export class Item {
 	@Column()
 	position: number;
 
-	@Column({ default: false })
+	@Column({ default: true })
 	checked: boolean;
 }
