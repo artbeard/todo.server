@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CheckListModule } from './check-list/check-list.module';
 
+// import { ListEntity } from './check-list/list.entity'
+// import { ItemEntity } from './check-list/item.entity'
 
 @Module({
   imports: [
@@ -15,8 +17,16 @@ import { CheckListModule } from './check-list/check-list.module';
       username: 'root',
       password: '',
       database: 'check_list',
-      entities: ['./**/*.entity.{ts|js}'],
-      synchronize: true,
+      entities: [
+          __dirname + '/**/*.entity.{ts|js}'
+      ],
+      //entities: [ListEntity, ItemEntity],
+      // migrations: [
+      //     __dirname + '/migrations/*{.ts,.js}',
+      //     __dirname + '/../src/migrations/*{.ts,.js}'
+      // ],
+      // migrationsTableName: "migrations",
+      synchronize: false,
     }),
     CheckListModule,
 
