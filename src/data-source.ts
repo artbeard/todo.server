@@ -1,8 +1,4 @@
 import { DataSource } from "typeorm"
-import { ListEntity } from './check-list/list.entity'
-import { ItemEntity } from './check-list/item.entity'
-
-console.log('dataSource dirname:', __dirname);
 
 const AppDataSource = new DataSource({
 	type: 'mysql',
