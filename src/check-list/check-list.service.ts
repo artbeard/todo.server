@@ -13,10 +13,13 @@ export class CheckListService {
 		// private ItemEntityRepository: Repository<ItemEntity>,
 	) {}
 	
-	async findAll()//: ListEntity[] 
+	findAll():Promise<ListEntity[]> 
 	{	
-		const allList = await this.ListEntityRepository.find();
-		return allList
+		return this.ListEntityRepository.find({
+			relations: {
+				items: true,
+			},
+		});
 	}
 	
 	findOne(id: number): Promise<ListEntity> {
