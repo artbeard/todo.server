@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from 'typeorm';
+//удалить
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CheckListModule } from './check-list/check-list.module';
-import { CheckListService } from './check-list/check-list.service';
 
-import { ListEntity } from './check-list/list.entity';
-import { ItemEntity } from './check-list/item.entity';
+//Модули
+import { TodoModule } from './todo/todo.module';
+//Сущности
+import { ListEntity } from './todo/list.entity';
+import { ItemEntity } from './todo/item.entity';
+
+
 
 @Module({
 	imports: [
@@ -31,7 +35,7 @@ import { ItemEntity } from './check-list/item.entity';
 			// migrationsTableName: "migrations",
 			synchronize: false,
 		}),
-		CheckListModule,
+		TodoModule,
 	],
 	controllers: [AppController],
 	providers: [
