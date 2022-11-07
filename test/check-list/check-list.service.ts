@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ListEntity } from './list.entity';
-import { ItemEntity } from './item.entity';
+import { ItemEntity } from '../todo/item.entity';
 
 @Injectable()
 export class CheckListService {

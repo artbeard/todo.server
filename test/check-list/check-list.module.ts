@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CheckListController } from './check-list.controller';
 
 import { ListEntity } from './list.entity';
-import { ItemEntity } from './item.entity';
+import { ItemEntity } from '../todo/item.entity';
 import { CheckListService } from './check-list.service';
 
 @Module({

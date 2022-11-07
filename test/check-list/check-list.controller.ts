@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ListEntity } from './list.entity';
 import { CheckListService } from './check-list.service'
-import { ItemEntity } from './item.entity';
+import { ItemEntity } from '../todo/item.entity';
 
 @Controller('check-list')
 export class CheckListController {
@@ -9,7 +9,7 @@ export class CheckListController {
     constructor(private checkListService: CheckListService){}
 
     @Get('/')
-    async getList()//:Promise<ListEntity[]>
+    async getList():Promise<ListEntity[]>
     {
         const Result = new Promise((Resolve) => {
             const list = this.checkListService.findAll()
@@ -28,6 +28,6 @@ export class CheckListController {
         })
         
         //const items = await list[0].items;
-        return Result
+        //return Result
     }
 }
