@@ -15,6 +15,6 @@ export class ItemEntity {
 	@Column()
 	position: number;
 
-	@Column({ default: true })
-	checked: boolean;
+	@Column({ default: false })
+	completed: boolean;
 }
