@@ -10,7 +10,7 @@ export class ListEntity {
 	title: string;
 
 	@Column()
-	userId: string;
+	userId: number;
 
 	@OneToMany(() => ItemEntity, (item) => item.list)
 	items: ItemEntity[];
