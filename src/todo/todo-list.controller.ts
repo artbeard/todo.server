@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Patch, Delete, Param, Req, Body } from '@ne
 import { Request } from 'express'
 
 import { TodoListService } from './todo-list.service'
+import { TodoItemService } from './todo-item.service'
 
 interface IDoneItemDto{
     complited: boolean
@@ -16,7 +17,8 @@ interface ITodoItemDto{
 export class TodoListController {
 
     constructor(
-        private todoListService: TodoListService
+        private todoListService: TodoListService,
+        private todoItemService: TodoItemService
     ){}
 
     @Get()
@@ -32,13 +34,20 @@ export class TodoListController {
         return this.todoListService.findOne(list_id);
     }
 
-    
+
     @Patch(':list_id/item/:item_id')
     completeTodo(
         @Param('list_id') list_id: number,
         @Param('item_id') item_id: number,
         @Body() {complited}: IDoneItemDto )
     {
+        this.todoItemService.findOne(item_id)
+            .then(item => {
+                item.completed = complited;
+                console.log(item);
+                this.todoItemService.save(item);
+            });
+        
         return `Дело ${item_id} в списке ${list_id} ${complited ? 'сделано!' : 'не сделано :('}`
     }
 
