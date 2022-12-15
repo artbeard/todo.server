@@ -11,30 +11,13 @@ import { TodoModule } from './todo/todo.module';
 import { ListEntity } from './todo/list.entity';
 import { ItemEntity } from './todo/item.entity';
 
+import { dataSourceOptions } from "./data-source";
 
+console.log(typeof dataSourceOptions, dataSourceOptions)
 
 @Module({
 	imports: [
-		TypeOrmModule.forRoot({
-			type: 'mysql',
-			host: '127.0.0.1',
-			port: 3306,
-			username: 'root',
-			password: '',
-			database: 'check_list',
-			entities: [
-				//__dirname + '/**/*.entity{.ts|.js}'
-				ListEntity,
-				ItemEntity
-			],
-			//entities: [ListEntity, ItemEntity],
-			// migrations: [
-			//     __dirname + '/migrations/*{.ts,.js}',
-			//     __dirname + '/../src/migrations/*{.ts,.js}'
-			// ],
-			// migrationsTableName: "migrations",
-			synchronize: false,
-		}),
+		TypeOrmModule.forRoot(dataSourceOptions),
 		TodoModule,
 	],
 	controllers: [AppController],

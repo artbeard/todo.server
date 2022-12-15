@@ -1,6 +1,6 @@
-import { DataSource } from "typeorm"
+import { DataSource, DataSourceOptions } from "typeorm"
 
-const AppDataSource = new DataSource({
+export const dataSourceOptions: any = {
 	type: 'mysql',
 	host: '127.0.0.1',
 	port: 3306,
@@ -10,7 +10,7 @@ const AppDataSource = new DataSource({
 	synchronize: true,
 	entities: [
 		__dirname + '/**/*.entity.js',
-	//	__dirname + '/../src/**/*.entity{.ts|.js}'
+		//	__dirname + '/../src/**/*.entity{.ts|.js}'
 	],
 	//entities: [ListEntity, ItemEntity],
 	migrationsTableName: "migrations",
@@ -18,5 +18,8 @@ const AppDataSource = new DataSource({
 		__dirname + '/migrations/*.js',
 		//__dirname + '/../src/migrations/*.ts'
 	],
-})
+};
+//export dataSourceOptions;
+
+const AppDataSource = new DataSource(dataSourceOptions as DataSourceOptions)
 export default AppDataSource;
