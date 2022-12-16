@@ -2,7 +2,6 @@ import {Body, Controller, Param, HttpException, HttpStatus, Patch, Post, Delete,
 import {TodoListService} from "./todo-list.service";
 import {TodoItemService} from "./todo-item.service";
 import {ItemEntity} from "./item.entity"
-import {rejects} from "assert";
 
 interface IItemCreate{
     id: null | number,
