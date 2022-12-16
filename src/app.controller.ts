@@ -1,27 +1,67 @@
-import { Get, Controller, Render } from '@nestjs/common';
+import {Get, Controller, Render, HttpException, HttpStatus} from '@nestjs/common';
 import { ConverterService } from "./converter.service";
-
+// import fs from 'fs/promises'
+// import {existsSync} from "fs";
+const fs = require('fs/promises');
+const path = require('node:path');
 
 @Controller()
 export class AppController {
 
-  //private converter: Converter;
-
   constructor(
       private converter: ConverterService
-  ) {
-    //this.converter = new Converter({metadata: true});
-  }
+  ) {}
 
+  /**
+   * Индексная страница О проекте
+   */
   @Get()
   @Render('index')
   action_index() {
-    return { message: 'Hello world!' };
+    let path1 = path.resolve(__dirname, '../static-pages/about.md');
+    return new Promise(resolve => {
+      fs.readFile(path1, 'utf8')
+          .then(data => {
+            let result =  {
+              message: this.converter.convert(data),
+              title: this.converter.getMetaData(),
+            };
+            console.log(result);
+
+            resolve(result);
+
+          })
+          .catch(err => {
+            console.log(err);
+            throw new HttpException('Не удалось найти запрашиваемый материал', HttpStatus.NOT_FOUND);
+          })
+    })
+
+
+    // return {
+    //   title: 'Отказ от ответственности',
+    //   message: 'Hello world!'
+    // };
   }
 
+  /**
+   * Страница - отказ от обязательств
+   */
+  @Get('/disclaimer')
+  @Render('index')
+  action_disclaimer() {
+    return {
+      title: 'Отказ от ответственности',
+      message: 'Hello world!'
+    };
+  }
+
+  /**
+   * Страница SPA приложения
+   */
   @Get('/todo')
   @Render('index')
-  action_hello() {
+  action_todo() {
 
     let content = `---
 Title:    A Sample MultiMarkdown Document
