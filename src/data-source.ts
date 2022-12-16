@@ -19,7 +19,6 @@ export const dataSourceOptions: any = {
 		//__dirname + '/../src/migrations/*.ts'
 	],
 };
-//export dataSourceOptions;
 
 const AppDataSource = new DataSource(dataSourceOptions as DataSourceOptions)
 export default AppDataSource;
