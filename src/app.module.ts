@@ -8,12 +8,11 @@ import { AppService } from './app.service';
 //Модули
 import { TodoModule } from './todo/todo.module';
 //Сущности
-import { ListEntity } from './todo/list.entity';
-import { ItemEntity } from './todo/item.entity';
+//import { ListEntity } from './todo/list.entity';
+//import { ItemEntity } from './todo/item.entity';
 
 import { dataSourceOptions } from "./data-source";
 
-console.log(typeof dataSourceOptions, dataSourceOptions)
 
 @Module({
 	imports: [
