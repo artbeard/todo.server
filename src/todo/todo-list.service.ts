@@ -32,9 +32,4 @@ export class TodoListService {
 			},
         });
 	}
-
-    completedItem(item_id: number)
-    {
-        
-    }
 }
