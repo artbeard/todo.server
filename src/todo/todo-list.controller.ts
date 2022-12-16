@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Patch, Delete, Param, Req, Body } from '@ne
 import { Request } from 'express'
 
 import { TodoListService } from './todo-list.service'
-import { TodoItemService } from './todo-item.service'
+//import { TodoItemService } from './todo-item.service'
 
 interface IDoneItemDto{
     complited: boolean
@@ -13,56 +13,31 @@ interface ITodoItemDto{
     checked: boolean
 }
 
-@Controller('todo')
+@Controller('/api/todo/')
 export class TodoListController {
 
     constructor(
         private todoListService: TodoListService,
-        private todoItemService: TodoItemService
+        //private todoItemService: TodoItemService
     ){}
 
-    @Get()
+    /**
+     * получение массива списков
+     * @param request
+     */
+    @Get('list')
     getAll(@Req() request: Request): any {
         let uid = request?.cookies.uid;
-        //return `Массив всех пользовательских списков дел ${uid}`;
         return this.todoListService.findAll(uid);
     }
 
-    @Get(':list_id')
+    /**
+     * Получение конкретного списка
+     * @param list_id
+     * @param request
+     */
+    @Get('list/:list_id')
     getList(@Param('list_id') list_id: number, @Req() request: Request): any {
-        //request?.cookies.uid
         return this.todoListService.findOne(list_id);
-    }
-
-
-    @Patch(':list_id/item/:item_id')
-    completeTodo(
-        @Param('list_id') list_id: number,
-        @Param('item_id') item_id: number,
-        @Body() {complited}: IDoneItemDto )
-    {
-        this.todoItemService.findOne(item_id)
-            .then(item => {
-                item.completed = complited;
-                console.log(item);
-                this.todoItemService.save(item);
-            });
-        
-        return `Дело ${item_id} в списке ${list_id} ${complited ? 'сделано!' : 'не сделано :('}`
-    }
-
-    @Put(':list_id/item/:item_id')
-    updateTodo(
-        @Param('list_id') list_id: number,
-        @Param('item_id') item_id: number,
-        @Body() todoItemDto: ITodoItemDto )
-    {
-        return `Дело ${item_id} в списке ${list_id} изменено ${JSON.stringify(todoItemDto, null, 4)}`
-    }
-
-    @Delete(':list_id/item/:item_id')
-    deleteTodo(@Param('list_id') list_id: number, @Param('item_id') item_id: number)
-    {
-        return `Удаление дела ${item_id} из списка ${list_id}`
     }
 }
