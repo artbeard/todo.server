@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from 'typeorm';
+import { ConverterService } from "./converter.service";
 //удалить
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,6 +15,7 @@ import { TodoModule } from './todo/todo.module';
 import { dataSourceOptions } from "./data-source";
 
 
+
 @Module({
 	imports: [
 		TypeOrmModule.forRoot(dataSourceOptions),
@@ -22,8 +24,8 @@ import { dataSourceOptions } from "./data-source";
 	controllers: [AppController],
 	providers: [
 		AppService,
-	//	CheckListService
-	],
+		ConverterService,
+	]
 })
 
 export class AppModule {
