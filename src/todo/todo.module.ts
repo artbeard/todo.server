@@ -8,7 +8,7 @@ import { TodoListService } from './todo-list.service';
 import { TodoItemService } from './todo-item.service';
 //Сущности
 import { ListEntity } from './list.entity';
-import { ItemEntity } from '../todo/item.entity';
+import { ItemEntity } from './item.entity';
 
 
 @Module({
