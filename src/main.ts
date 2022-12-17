@@ -1,40 +1,26 @@
-// import { NestFactory } from '@nestjs/core';
-// import { AppModule } from './app.module';
-
-// async function bootstrap() {
-//   const app = await NestFactory.create(AppModule);
-//   await app.listen(3000);
-// }
-// bootstrap();
-
-import * as hbs from 'hbs';
-
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-import { AppModule } from './app.module';
+import {NestFactory} from '@nestjs/core';
+import {NestExpressApplication} from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
-
-import { HttpExceptionFilter } from './http-exception.filter'
-
+import * as hbs from 'hbs';
+import {AppModule} from './app.module';
+import {HttpExceptionFilter} from './http-exception.filter'
+import {join} from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-  );
+    const app = await NestFactory.create<NestExpressApplication>(
+        AppModule,
+    );
+    app.useGlobalFilters(new HttpExceptionFilter());
 
-  app.useGlobalFilters( new HttpExceptionFilter() );
+    //app.useStaticAssets(join(__dirname, '..', 'public')); //для отдачи статикик
+    app.setBaseViewsDir(join(__dirname, '..', 'views'));
+    app.setViewEngine('hbs');
+    hbs.registerPartials(join(__dirname, '..', 'views', 'layouts'));
+    hbs.registerPartials(join(__dirname, '..', 'views', 'page'));
 
-  //app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.setViewEngine('hbs');
-  //hbs.layoutsDir(join(__dirname, '..', 'views/layouts'));
-  hbs.registerPartials(join(__dirname, '..', 'views', 'layouts'));
-  hbs.registerPartials(join(__dirname, '..', 'views', 'page'));
-  //hbs.defaultLayout = 'Name of the layout file',1
+    app.use(cookieParser());
 
-  app.use(cookieParser());
-  
-  await app.listen(3000);
+    await app.listen(3000);
 }
+
 bootstrap();
