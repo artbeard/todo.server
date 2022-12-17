@@ -1,69 +1,80 @@
-import {Get, Controller, Render, HttpException, HttpStatus} from '@nestjs/common';
-import { ConverterService } from "./converter.service";
-// import fs from 'fs/promises'
-// import {existsSync} from "fs";
+import {Controller, Render, HttpException, HttpStatus, Get, Res} from '@nestjs/common';
+import {ConverterService} from "./converter.service";
+import {Response} from 'express';
+import {AppService} from './app.service';
+
+
 const fs = require('fs/promises');
 const path = require('node:path');
 
 @Controller()
 export class AppController {
 
-  constructor(
-      private converter: ConverterService
-  ) {}
+    constructor(
+        private converter: ConverterService,
+        private appService: AppService
+    ) {
+    }
 
-  /**
-   * Индексная страница О проекте
-   */
-  @Get()
-  @Render('index')
-  action_index() {
-    let path1 = path.resolve(__dirname, '../static-pages/about.md');
-    return new Promise(resolve => {
-      fs.readFile(path1, 'utf8')
-          .then(data => {
-            let result =  {
-              message: this.converter.convert(data),
-              title: this.converter.getMetaData(),
-            };
-            console.log(result);
+    /**
+     * Индексная страница О проекте
+     */
+    @Get()
+    @Render('page/page-content')
+    action_index(@Res() response: Response) {
+        return new Promise(resolve => {
+            this.appService.loadFile('about.md')
+                .then(text => {
+                    const result = {
+                        content: this.converter.convert(text),
+                        title: (this.converter.getMetaData()).title,
+                        breadcrumbs: [
+                            {
+                                title: 'Главная',
+                                href: '/'
+                            }
+                        ]
+                    };
+                    resolve(result);
+                });
+        })
+    }
 
-            resolve(result);
+    /**
+     * Страница - отказ от обязательств
+     */
+    @Get('/disclaimer')
+    @Render('page/page-content')
+    action_disclaimer() {
+        return new Promise(resolve => {
+            this.appService.loadFile('disclaimer.md')
+                .then(text => {
+                    const result = {
+                        content: this.converter.convert(text),
+                        title: (this.converter.getMetaData()).title,
+                        breadcrumbs: [
+                            {
+                                title: 'О проекте',
+                                href: '/'
+                            },
+                            {
+                                title: 'Отказ от обязательств',
+                            }
+                        ]
+                    };
+                    resolve(result);
+                });
+        })
+    }
 
-          })
-          .catch(err => {
-            console.log(err);
-            throw new HttpException('Не удалось найти запрашиваемый материал', HttpStatus.NOT_FOUND);
-          })
-    })
+    /**
+     * Страница SPA приложения
+     */
+    @Get('/todo')
+    @Render('page/todo-content')
+    action_todo() {
 
-
-    // return {
-    //   title: 'Отказ от ответственности',
-    //   message: 'Hello world!'
-    // };
-  }
-
-  /**
-   * Страница - отказ от обязательств
-   */
-  @Get('/disclaimer')
-  @Render('index')
-  action_disclaimer() {
-    return {
-      title: 'Отказ от ответственности',
-      message: 'Hello world!'
-    };
-  }
-
-  /**
-   * Страница SPA приложения
-   */
-  @Get('/todo')
-  @Render('index')
-  action_todo() {
-
-    let content = `---
+        let content = `---
 Title:    A Sample MultiMarkdown Document
 ---
 ## Description
@@ -107,10 +118,10 @@ $ npm run test:cov
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
     `;
-    let message = this.converter.convert(content);
-    console.log(
-        this.converter.getMetaData()
-    )
-    return { message: message };
-  }
+        let message = this.converter.convert(content);
+        // console.log(
+        //     this.converter.getMetaData()
+        // )
+        return {message: message};
+    }
 }
