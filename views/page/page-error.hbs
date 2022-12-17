@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link href="/assets/css/vendor.min.css" rel="stylesheet"/>
+    <link href="/assets/css/app.min.css" rel="stylesheet"/>
+	<link rel="icon" href="/assets/favicon.ico" />
+	<title>Ошибка {{status}}</title>
+  </head>
+  <body>
+	<div class="app app-boxed-layout">
+        <div id="app" class="app app-full-height app-without-header">
+        	<div class="error-page">
+        		<div class="error-page-content">
+        			<div class="card mb-5 mx-auto" style="max-width: 320px;">
+        				<div class="card-body">
+        					<div class="card">
+        						<div class="error-code">{{status}}</div>
+        						<div class="card-arrow">
+        							<div class="card-arrow-top-left"></div>
+        							<div class="card-arrow-top-right"></div>
+        							<div class="card-arrow-bottom-left"></div>
+        							<div class="card-arrow-bottom-right"></div>
+        						</div>
+        					</div>
+        				</div>
+        				<div class="card-arrow">
+        					<div class="card-arrow-top-left"></div>
+        					<div class="card-arrow-top-right"></div>
+        					<div class="card-arrow-bottom-left"></div>
+        					<div class="card-arrow-bottom-right"></div>
+        				</div>
+        			</div>
+        			<h1>Упс!</h1>
+        			<h3>{{message}}</h3>
+        			<hr>
+        			<p class="mb-1">
+        				<small>Вот некоторые полезные ссылки:</small>
+        			</p>
+        			<p class="mb-5">
+        				<a href="/" class="text-decoration-none text-white text-opacity-50">О проекте</a>
+        				<span class="link-divider"></span>
+        				<a href="/todo" class="text-decoration-none text-white text-opacity-50">Мои дела</a>
+        			</p>
+        			<a href="javascript:window.history.back();" class="btn btn-outline-theme px-3 rounded-pill"><i class="fa fa-arrow-left me-1 ms-n1"></i> Назад</a>
+        		</div>
+        	</div>
+        </div>
+	</div>
+  </body>
+</html>
+
