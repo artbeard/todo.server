@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Converter } from 'showdown'
 
+/**
+ * Ковертация файлов в html
+ */
 @Injectable()
 export class ConverterService {
     private converter;
