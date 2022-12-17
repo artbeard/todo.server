@@ -1,9 +1,23 @@
 {{#> index}}
     {{#*inline "page-content"}}
+        {{#if breadcrumbs}}
         <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="layout_starter.html#">LAYOUT</a></li>
-            <li class="breadcrumb-item active">STARTER PAGE</li>
+            {{#each breadcrumbs}}
+                {{#if this.href}}
+                    <li class="breadcrumb-item">
+                        <a href="{{this.href}}">{{this.title}}</a>
+                    </li>
+                {{else}}
+                    <li class="breadcrumb-item active">
+                        {{this.title}}
+                    </li>
+                {{/if}}
+            {{/each}}
         </ul>
+        {{/if}}
+        {{#if pageHeader}}
+            <h1 class="page-header">{{ pageHeader }}</h1>
+        {{/if}}
         {{{ content }}}
     {{/inline}}
 {{/index}}
