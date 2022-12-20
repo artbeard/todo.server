@@ -13,13 +13,14 @@ import { TodoModule } from './todo/todo.module';
 //import { ItemEntity } from './todo/item.entity';
 
 import { dataSourceOptions } from "./data-source";
-
+import { UserModule } from './user/user.module';
 
 
 @Module({
 	imports: [
 		TypeOrmModule.forRoot(dataSourceOptions),
 		TodoModule,
+		UserModule,
 	],
 	controllers: [AppController],
 	providers: [
