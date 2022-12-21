@@ -8,24 +8,25 @@ export class UserEntity {
 	@Column('varchar',{length: 100})
 	name: string;
 
-	@Column('varchar', {length: 300, nullable: true})
+	@Column('varchar', {length: 300, nullable: true, default: null})
 	password: string;
 
-	@Column('varchar',{length: 128, nullable: true})
+	@Column('varchar',{length: 128, nullable: true, default: null})
 	email: string;
+
 
 	@CreateDateColumn()
 	createdAt: Date;
 
 	//Дата последнего доступа
-	@UpdateDateColumn({nullable: true})
+	@UpdateDateColumn({nullable: true, default: null})
 	lastActive: Date;
 
 	@Column({ default: false })
 	isActive: boolean;
 
 	//временное решение, позже переделать для активации
-	@Column('varchar', {length: 300, unique: true, nullable: true})
+	@Column('varchar', {length: 300, unique: true, nullable: true, default: null})
 	hash: string;
 
 	//Позже добавить
