@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {UserEntity} from './user.entity';
@@ -29,5 +29,15 @@ export class UserService {
 				createdUser.hash = hasher.update(String(createdUser.id)).digest('hex');
 				return this.userEntityRepository.save(createdUser)
 			})
+	}
+
+	getUser(id: number): Promise<UserEntity>
+	{
+		return this.userEntityRepository.findOneByOrFail({id})
+	}
+
+	isValidUser(user: UserEntity, token: string): boolean
+	{
+		return user.hash === token;
 	}
 }
