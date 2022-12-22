@@ -34,9 +34,7 @@ export class UserController {
                     response
                         .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
                         .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                    return {
-                        user
-                    }
+                    return user;
                 }
                 else
                 {
@@ -75,10 +73,7 @@ export class UserController {
                     response
                         .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
                         .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                    return {
-                        uid,
-                        token: request.cookies.token ?? undefined
-                    }
+                    return user;
                 }
                 else
                 {
