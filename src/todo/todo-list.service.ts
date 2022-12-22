@@ -32,4 +32,9 @@ export class TodoListService {
 			},
         });
 	}
+
+	addList(new_list: ListEntity): Promise<ListEntity>
+    {
+        return this.ListEntityRepository.save(new_list);
+    }
 }
