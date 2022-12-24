@@ -1,4 +1,5 @@
-import {Controller, Body, Req, Res, Post, Get, Param, HttpException, HttpStatus} from '@nestjs/common';
+import {Controller, Body, Req, Res, Post, Get, Param, HttpException, HttpStatus, UseGuards} from '@nestjs/common';
+import { CheckAuthGuard } from '../check-auth/check-auth.guard'
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
@@ -20,12 +21,13 @@ export class UserController {
      * @param response
      */
     @Get()
+    @UseGuards(CheckAuthGuard)
     getUser(@Req() request: Request, @Res({ passthrough: true }) response: Response)
     {
         let uid = request.cookies.uid ?? undefined;
         let token = request.cookies.token ?? undefined;
         if (!uid || !token)
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
 
         return this.userService.getUser(uid)
             .then(user => {
@@ -34,14 +36,12 @@ export class UserController {
                     response
                         .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
                         .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
+                    delete(user.password);
                     return user;
                 }
                 else
                 {
-                    response
-                        .cookie('uid', uid, {maxAge: -1000 * 60 * 60 * 24 * 365})
-                        .cookie('token', token, {maxAge: -1000 * 60 * 60 * 24 * 365})
-                    return {}
+                    throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
                 }
             })
             .catch(err => {
