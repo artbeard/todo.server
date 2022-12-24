@@ -1,4 +1,5 @@
-import {Controller, Get, Post, Put, Patch, Delete, Param, Req, Res, Body, HttpException} from '@nestjs/common';
+import {Controller, Get, Post, Put, Patch, Delete, Param, Req, Res, Body, HttpException, UseGuards} from '@nestjs/common';
+import { CheckAuthGuard } from '../check-auth/check-auth.guard'
 import {Request, Response} from 'express'
 
 import { TodoListService } from './todo-list.service'
@@ -26,7 +27,7 @@ interface ITodoItemDto{
 
 
 
-
+@UseGuards(CheckAuthGuard)
 @Controller('/api/todo/')
 export class TodoListController {
 

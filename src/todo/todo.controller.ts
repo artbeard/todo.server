@@ -1,4 +1,5 @@
-import {Body, Controller, Param, HttpException, HttpStatus, Patch, Post, Delete, Put} from '@nestjs/common';
+import {Body, Controller, Param, HttpException, HttpStatus, Patch, Post, Delete, Put, UseGuards} from '@nestjs/common';
+import { CheckAuthGuard } from '../check-auth/check-auth.guard'
 import {TodoListService} from "./todo-list.service";
 import {TodoItemService} from "./todo-item.service";
 import {ItemEntity} from "./item.entity"
@@ -10,6 +11,7 @@ interface IItemCreate{
     position: number,
 }
 
+@UseGuards(CheckAuthGuard)
 @Controller('/api/todo/item')
 export class TodoController {
 
@@ -17,8 +19,6 @@ export class TodoController {
         private todoListService: TodoListService,
         private todoItemService: TodoItemService
     ){}
-
-
 
     /**
      * Создание новой позиции в списке дел
