@@ -7,6 +7,9 @@ import { UserEntity } from './user.entity';
 interface IUserDto{
     name: string
 }
+export interface IRequestWithUserAuth extends Request {
+    user: UserEntity | undefined
+}
 
 @Controller('/api/user')
 export class UserController {
@@ -22,12 +25,18 @@ export class UserController {
      */
     @Get()
     @UseGuards(CheckAuthGuard)
-    getUser(@Req() request: Request, @Res({ passthrough: true }) response: Response)
+    getUser(@Req() request: IRequestWithUserAuth, @Res({ passthrough: true }) response: Response)
     {
         let uid = request.cookies.uid ?? undefined;
         let token = request.cookies.token ?? undefined;
         if (!uid || !token)
             throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+
+
+        console.log(
+            request?.user
+        );
+
 
         return this.userService.getUser(uid)
             .then(user => {

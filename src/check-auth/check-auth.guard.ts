@@ -17,6 +17,8 @@ export class CheckAuthGuard implements CanActivate {
             this.userService.getUser(cookies.uid)
                 .then(user => {
                     if (this.userService.isValidUser(user, cookies.token)) {
+                        const request = context.switchToHttp().getRequest();
+                        request.user = user;
                         resolve(true);
                     } else {
                         resolve(false);
