@@ -22,7 +22,7 @@ import { TodoListService } from './todo-list.service'
 import { ListEntity } from "./list.entity";
 import { UserService } from "../user/user.service";
 
-
+import { CheckAccess } from "../check-auth/check-access";
 
 interface IDoneItemDto{
     complited: boolean
@@ -42,13 +42,15 @@ interface ITodoItemDto{
 
 @UseGuards(CheckAuthGuard)
 @Controller('/api/todo/')
-export class TodoListController {
+export class TodoListController extends CheckAccess{
 
     constructor(
         private todoListService: TodoListService,
         //private todoItemService: TodoItemService
         protected userService: UserService,
-    ){}
+    ){
+        super();
+    }
 
     /**
      * получение массива списков
@@ -83,31 +85,32 @@ export class TodoListController {
         @Req() request: IRequestWithUserAuth,
         @Res({ passthrough: true }) response: Response): Promise<{id: number}>
     {
-        //return new Promise(resolve => {
-            let newList = new ListEntity();
-            newList.userId = request.user.id;
-            newList.title = title;
-            return await this.todoListService.addList(newList)
-                .then(data => {
-                    //resolve({id: data.id});
-                    return {id: data.id};
-                })
-        //});
+        let newList = new ListEntity();
+        newList.userId = request.user.id;
+        newList.title = title;
+        return await this.todoListService.addList(newList)
+            .then(data => {
+                return {id: data.id};
+            })
     }
 
     @Delete('list/:list_id')
     async deleteList(
         @Param('list_id') list_id: number,
         @Req() request: IRequestWithUserAuth,
-        @Res({ passthrough: true }) response: Response): Promise<boolean>
+        @Res({ passthrough: true }) response: Response): Promise<any>
     {
-        //return new Promise(resolve => {
-            return await this.todoListService.deleteList(list_id)
-                .then(()=>{
-                    //resolve (true)
-                    return true;
-                })
-        //});
+        let list = await this.todoListService.findOne(list_id)
+
+        if (!this.hasAccess(request?.user, list))
+        {
+            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+        }
+
+        return await this.todoListService.removeList(list)
+            .then(()=>{
+                return '';
+            })
     }
 
 }
