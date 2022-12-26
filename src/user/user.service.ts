@@ -11,7 +11,7 @@ interface ICreateUser{
 }
 
 @Injectable()
-export class UserService {
+export class UserService{
 
 	constructor(
 		@InjectRepository(UserEntity)
