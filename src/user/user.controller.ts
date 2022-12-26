@@ -70,11 +70,12 @@ export class UserController {
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response)
     {
-        let cookie_uid = request.cookies.uid ?? undefined;
-        let cookie_token = request.cookies.token ?? undefined;
-
+        // let cookie_uid = request.cookies.uid ?? undefined;
+        // let cookie_token = request.cookies.token ?? undefined;
+        console.log('Попытка установить пользователя', uid, token)
         return this.userService.getUser(uid)
             .then(user => {
+                console.log(user, uid, token)
                 if (this.userService.isValidUser(user, token))
                 {
                     response
@@ -87,13 +88,11 @@ export class UserController {
                     response
                         .cookie('uid', uid, {maxAge: -1000 * 60 * 60 * 24 * 365})
                         .cookie('token', token, {maxAge: -1000 * 60 * 60 * 24 * 365})
-                    return {
-                        uid: undefined,
-                        token: undefined
-                    }
+                    return {};
                 }
             })
             .catch(err => {
+                console.log(err, uid, token)
                 throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST)
             })
     }
