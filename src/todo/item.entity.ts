@@ -6,7 +6,7 @@ export class ItemEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => ListEntity, (list) => list.items)
+	@ManyToOne(() => ListEntity, (list) => list.items, { onDelete: "CASCADE" })
 	list: ListEntity;
 
 	@Column()

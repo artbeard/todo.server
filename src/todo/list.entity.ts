@@ -12,7 +12,7 @@ export class ListEntity {
 	@Column()
 	userId: number;
 
-	@OneToMany(() => ItemEntity, (item) => item.list)
+	@OneToMany(() => ItemEntity, (item) => item.list, { cascade: true })
 	items: ItemEntity[];
 
 	@Column({ default: false })
