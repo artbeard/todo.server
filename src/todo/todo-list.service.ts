@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ListEntity } from './list.entity';
@@ -36,7 +36,11 @@ export class TodoListService {
 			relations: {
 				items: true,
 			},
-        });
+        })
+            // .then(List => List)
+            .catch(err => {
+                throw new HttpException('Список не найден', HttpStatus.NOT_FOUND);
+            });
 	}
 
     /**
@@ -49,7 +53,7 @@ export class TodoListService {
     }
 
     /**
-     * Удаление списка со всеми записями
+     * Поиск и Удаление списка со всеми записями по id
      * @param listId
      */
     deleteList(listId: number): Promise<any>
@@ -58,5 +62,14 @@ export class TodoListService {
             .then(List => {
                 return this.listEntityRepository.remove(List);
             })
+    }
+
+    /**
+     * Удаление списка
+     * @param list
+     */
+    removeList(list: ListEntity)
+    {
+        return this.listEntityRepository.remove(list);
     }
 }
