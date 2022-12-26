@@ -1,12 +1,25 @@
-import {Controller, Get, Post, Put, Patch, Delete, Param, Req, Res, Body, HttpException, UseGuards} from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Patch,
+    Delete,
+    Param,
+    Body,
+    Req,
+    Res,
+    UseGuards,
+    HttpException,
+    HttpStatus
+} from '@nestjs/common';
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
-import {Request, Response} from 'express'
-
+import { Request, Response } from 'express'
+import { IRequestWithUserAuth } from "../use/interfaces";
 import { TodoListService } from './todo-list.service'
 //import { TodoItemService } from './todo-item.service'
 
 import { ListEntity } from "./list.entity";
-
 import { UserService } from "../user/user.service";
 
 
@@ -42,8 +55,8 @@ export class TodoListController {
      * @param request
      */
     @Get('list')
-    getAll(@Req() request: Request): any {
-        let uid = request?.cookies.uid;
+    getAll(@Req() request: IRequestWithUserAuth): any {
+        let uid = request?.user.id;
         return this.todoListService.findAll(uid);
     }
 
@@ -53,42 +66,48 @@ export class TodoListController {
      * @param request
      */
     @Get('list/:list_id')
-    getList(@Param('list_id') list_id: number, @Req() request: Request): any {
-        return this.todoListService.findOne(list_id);
+    getList(@Param('list_id') list_id: number, @Req() request: IRequestWithUserAuth): Promise<ListEntity> {
+        return this.todoListService.findOne(list_id)
+            .then(List => {
+                if (List?.userId !== request?.user.id)
+                {
+                    throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+                }
+                return List;
+            });
     }
 
     @Post('list')
-    createList(
+    async createList(
         @Body() { title }: { title: string },
-        @Req() request: Request,
-        @Res({ passthrough: true }) response: Response): any
+        @Req() request: IRequestWithUserAuth,
+        @Res({ passthrough: true }) response: Response): Promise<{id: number}>
     {
-        let uid = request.cookies?.uid ?? undefined;
-        let hash = request.cookies?.token ?? undefined;
-        //title
-        return new Promise(resolve => {
-            const user = this.userService.getUser(uid)
-                .then(user => {
-                    if (!this.userService.isValidUser(user, hash))
-                        throw new HttpException('Досуп запрещен', 403);
-
-                    let newList = new ListEntity();
-                    newList.userId = user.id;
-                    newList.title = title;
-                    this.todoListService.addList(newList)
-                        .then(data => {
-                            resolve({id: data.id});
-                            //return {id: data.id}
-                        })
-
-                    //this.todoListService.
+        //return new Promise(resolve => {
+            let newList = new ListEntity();
+            newList.userId = request.user.id;
+            newList.title = title;
+            return await this.todoListService.addList(newList)
+                .then(data => {
+                    //resolve({id: data.id});
+                    return {id: data.id};
                 })
-        });
+        //});
+    }
 
-
-
-
-        //return {id: 122}
+    @Delete('list/:list_id')
+    async deleteList(
+        @Param('list_id') list_id: number,
+        @Req() request: IRequestWithUserAuth,
+        @Res({ passthrough: true }) response: Response): Promise<boolean>
+    {
+        //return new Promise(resolve => {
+            return await this.todoListService.deleteList(list_id)
+                .then(()=>{
+                    //resolve (true)
+                    return true;
+                })
+        //});
     }
 
 }
