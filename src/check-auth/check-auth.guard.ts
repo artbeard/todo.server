@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from '../user/user.service';
 
@@ -23,6 +23,9 @@ export class CheckAuthGuard implements CanActivate {
                     } else {
                         resolve(false);
                     }
+                })
+                .catch(err => {
+                    resolve(false);
                 })
         })
     }
