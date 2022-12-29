@@ -7,14 +7,14 @@ export interface IRequestWithUserAuth extends Request {
 }
 
 export interface IUserDto{
-    id?: number | null;
+    id?: number;
     name: string;
-    password?: string | null;
-    email?: string | null;
+    password?: string;
+    email?: string;
     createdAt?: Date;
     lastActive?: Date;
     isActive?: boolean;
-    hash?: string | null;
+    hash?: string;
 }
 
 export interface ITodoListDto{
@@ -23,4 +23,11 @@ export interface ITodoListDto{
     userId?: number;
     items?: ItemEntity[];
     isActive?: boolean;
+}
+
+export interface ITodoItemDto{
+    id?: number,
+    content: string,
+    completed?: boolean,
+    position?: number,
 }
