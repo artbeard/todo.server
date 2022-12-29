@@ -1,6 +1,6 @@
 import {Request} from "express";
 import {UserEntity} from "../user/user.entity";
-import {Column, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import {ItemEntity} from "../todo/item.entity";
 
 export interface IRequestWithUserAuth extends Request {
     user: UserEntity | undefined
@@ -15,4 +15,12 @@ export interface IUserDto{
     lastActive?: Date;
     isActive?: boolean;
     hash?: string | null;
+}
+
+export interface ITodoListDto{
+    id?: number;
+    title: string;
+    userId?: number;
+    items?: ItemEntity[];
+    isActive?: boolean;
 }
