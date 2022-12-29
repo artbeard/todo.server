@@ -19,29 +19,21 @@ export class UserController {
      */
     @Get()
     @UseGuards(CheckAuthGuard)
-    actionGetUser(
+    async actionGetUser(
         @Req() request: IRequestWithUserAuth,
         @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
-        return this.userService.getUser(request?.user.id)
-            .then(user => {
-                if (this.userService.isValidUser(user, request.cookies?.token))
-                {
-                    response
-                        .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                        .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                    delete(user.password);
-                    //user.password = undefined;
-                    return user;
-                }
-                else
-                {
-                    throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
-                }
-            })
-            .catch(err => {
-                throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST)
-            })
+        const user = await this.userService.getUser(request?.user.id);
+        if (!user || !this.userService.isValidUser(user, request.cookies?.token))
+        {
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+        }
+        response
+            .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
+            .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
+        delete(user.password);
+        //user.password = undefined;
+        return user;
     }
 
     /**
@@ -52,32 +44,25 @@ export class UserController {
      * @param response
      */
     @Get('/:uid/:token')
-    actionSetUser(
+    async actionSetUser(
         @Param('uid') uid: number,
         @Param('token') token: string,
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
-        return this.userService.getUser(uid)
-            .then(user => {
-                if (this.userService.isValidUser(user, token))
-                {
-                    response
-                        .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                        .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                    return user;
-                }
-                else
-                {
-                    response
-                        .cookie('uid', 0, {maxAge: -1000})
-                        .cookie('token', 0, {maxAge: -1000})
-                    throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST)
-                }
-            })
-            .catch(err => {
-                throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST)
-            })
+        const user = await this.userService.getUser(uid);
+        if (!user || !this.userService.isValidUser(user, token))
+        {
+            response
+                .cookie('uid', 0, {maxAge: -1000})
+                .cookie('token', 0, {maxAge: -1000})
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+        }
+
+        response
+            .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
+            .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
+        return user;
     }
 
     /**
@@ -86,17 +71,17 @@ export class UserController {
      * @param response
      */
     @Post('make')
-    actionCreateUser(
+    async actionCreateUser(
         @Body() { name }: IUserDto,
         @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
-        return this.userService.createNewUser({name})
-            .then(createdUser => {
-                response
-                    .cookie('uid', createdUser.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                    .cookie('token', createdUser.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
-                return createdUser;
-            });
+        if (!name)
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+        const user = await this.userService.createNewUser({name});
+        response
+            .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
+            .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
+        return user;
     }
 
 }
