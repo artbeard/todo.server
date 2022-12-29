@@ -4,10 +4,7 @@ import { CheckAuthGuard } from '../check-auth/check-auth.guard'
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
-
-interface IUserDto{
-    name: string
-}
+import { IUserDto } from "../use/interfaces";
 
 @Controller('/api/user')
 export class UserController {
@@ -23,27 +20,19 @@ export class UserController {
      */
     @Get()
     @UseGuards(CheckAuthGuard)
-    getUser(@Req() request: IRequestWithUserAuth, @Res({ passthrough: true }) response: Response)
+    actionGetUser(
+        @Req() request: IRequestWithUserAuth,
+        @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
-        let uid = request.cookies.uid ?? undefined;
-        let token = request.cookies.token ?? undefined;
-        if (!uid || !token)
-            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
-
-
-        console.log(
-            request?.user
-        );
-
-
-        return this.userService.getUser(uid)
+        return this.userService.getUser(request?.user.id)
             .then(user => {
-                if (this.userService.isValidUser(user, token))
+                if (this.userService.isValidUser(user, request.cookies?.token))
                 {
                     response
                         .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
                         .cookie('token', user.hash, {maxAge: 1000 * 60 * 60 * 24 * 365})
                     delete(user.password);
+                    //user.password = undefined;
                     return user;
                 }
                 else
@@ -64,18 +53,14 @@ export class UserController {
      * @param response
      */
     @Get('/:uid/:token')
-    setUser(
+    actionSetUser(
         @Param('uid') uid: number,
         @Param('token') token: string,
         @Req() request: Request,
-        @Res({ passthrough: true }) response: Response)
+        @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
-        // let cookie_uid = request.cookies.uid ?? undefined;
-        // let cookie_token = request.cookies.token ?? undefined;
-        console.log('Попытка установить пользователя', uid, token)
         return this.userService.getUser(uid)
             .then(user => {
-                console.log(user, uid, token)
                 if (this.userService.isValidUser(user, token))
                 {
                     response
@@ -86,13 +71,12 @@ export class UserController {
                 else
                 {
                     response
-                        .cookie('uid', uid, {maxAge: -1000 * 60 * 60 * 24 * 365})
-                        .cookie('token', token, {maxAge: -1000 * 60 * 60 * 24 * 365})
-                    return {};
+                        .cookie('uid', 0, {maxAge: -1000})
+                        .cookie('token', 0, {maxAge: -1000})
+                    throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST)
                 }
             })
             .catch(err => {
-                console.log(err, uid, token)
                 throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST)
             })
     }
@@ -103,7 +87,7 @@ export class UserController {
      * @param response
      */
     @Post('make')
-    createUser(
+    actionCreateUser(
         @Body() { name }: IUserDto,
         @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
