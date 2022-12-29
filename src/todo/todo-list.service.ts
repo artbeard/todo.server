@@ -44,10 +44,10 @@ export class TodoListService {
 	}
 
     /**
-     * Добавление списка
+     * Сохранение списка в бд
      * @param new_list
      */
-	addList(new_list: ListEntity): Promise<ListEntity>
+	saveList(new_list: ListEntity): Promise<ListEntity>
     {
         return this.listEntityRepository.save(new_list);
     }
