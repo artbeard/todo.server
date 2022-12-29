@@ -1,10 +1,9 @@
 import {Controller, Body, Req, Res, Post, Get, Param, HttpException, HttpStatus, UseGuards} from '@nestjs/common';
-import { IRequestWithUserAuth } from "../use/interfaces";
+import { IRequestWithUserAuth, IUserDto } from "../use/interfaces";
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
-import { IUserDto } from "../use/interfaces";
 
 @Controller('/api/user')
 export class UserController {
