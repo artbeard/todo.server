@@ -1,94 +1,127 @@
-import {Body, Controller, Param, HttpException, HttpStatus, Patch, Post, Delete, Put, UseGuards} from '@nestjs/common';
+import {
+    Controller,
+    Body,
+    Param,
+    Req,
+    HttpException,
+    HttpStatus,
+    Patch,
+    Post,
+    Delete,
+    Put,
+    UseGuards, Res
+} from '@nestjs/common';
+import { CheckAccess } from "../check-auth/check-access";
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
-import {TodoListService} from "./todo-list.service";
-import {TodoItemService} from "./todo-item.service";
-import {ItemEntity} from "./item.entity"
+import { Response } from "express";
+import { TodoListService } from "./todo-list.service";
+import { TodoItemService } from "./todo-item.service";
+import { ItemEntity } from "./item.entity"
+import { ITodoItemDto, IRequestWithUserAuth } from "../use/interfaces";
 
-interface IItemCreate{
-    id: null | number,
-    content: string,
-    completed: boolean,
-    position: number,
-}
+
 
 @UseGuards(CheckAuthGuard)
 @Controller('/api/todo/item')
-export class TodoController {
+export class TodoController extends CheckAccess{
 
     constructor(
         private todoListService: TodoListService,
         private todoItemService: TodoItemService
-    ){}
+    ){
+        super();
+    }
 
     /**
      * Создание новой позиции в списке дел
      * @param list_id
-     * @param content
-     * @param position
-     * @param completed
-     * @return Promise<{id:number}> Возвращает id созданного дела
+     * @param todoItemData
+     * @param request
      */
     @Post('/in/:list_id')
-    createTodoItem(@Param('list_id') list_id: number, @Body() {content, position, completed}: IItemCreate): Promise<{id:number}>
+    async createTodoItem(
+        @Param('list_id') list_id: number,
+        @Body() todoItemData: ITodoItemDto,
+        @Req() request: IRequestWithUserAuth): Promise<{id:number}>
     {
-        return new Promise((resolve, reject) => {
-            this.todoListService.findOne(list_id)
-                .then((listEntity)=>{
+        if (!todoItemData.content)
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
 
-                    let newTodoItem = new ItemEntity();
-                    newTodoItem.content = content;
-                    newTodoItem.position = position;
-                    newTodoItem.completed = completed;
-                    newTodoItem.list = listEntity;
+        const list = await this.todoListService.findOne(list_id);
 
-                    this.todoItemService.save(newTodoItem)
-                        .then(savedTodoItem => {
-                            resolve({id: savedTodoItem.id});
-                        })
+        if (!list)
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
 
-                })
-                .catch((err)=>{
-                    //throw new Error('не удалось создать новое дело');
-                    reject(err);
-                })
-        })
+        if (!this.hasAccess(request?.user, list))
+            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+
+        const newItem = await this.todoItemService.createNewTodoItem(todoItemData, list);
+
+        return {id: newItem.id}
     }
 
-
+    /**
+     * Изменение отметки о выполнении дела
+     * @param item_id
+     * @param completed
+     * @param request
+     * @param response
+     */
     @Patch('/:item_id/complete')
-    completeTodo(@Param('item_id') item_id: number, @Body() { completed }: IItemCreate )
+    async completeTodo(
+        @Param('item_id') item_id: number,
+        @Body() { completed }: ITodoItemDto,
+        @Req() request: IRequestWithUserAuth,
+        @Res({ passthrough: true }) response: Response): Promise<void>
     {
-        return new Promise((resolve, reject) => {
-            this.todoItemService.setCompleted(item_id, completed)
-                .then((res)=>{
-                    resolve(res);
-                })
-                .catch(()=>{
-                    throw new HttpException('Не удалось изменить состояние', HttpStatus.BAD_REQUEST);
-                });
-        })
+        const item = await this.todoItemService.getItem(item_id);
 
+        if (!this.hasAccess(request?.user, item))
+            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+
+        response.status(HttpStatus.NO_CONTENT);
+        await this.todoItemService.setCompleted(item, !!completed)
     }
 
-    @Put('/:item_id')
-    updateTodoItem(@Param('item_id') item_id: number, @Body() { content }: {content: string})
+    /**
+     * Изменение содержимого одного выбранного дела
+     * @param item_id
+     * @param content
+     * @param request
+     * @param response
+     */
+    @Patch('/:item_id')
+    async changeContentTodoItem(
+        @Param('item_id') item_id: number,
+        @Body() { content }: ITodoItemDto,
+        @Req() request: IRequestWithUserAuth,
+        @Res({ passthrough: true }) response: Response): Promise<void>
     {
-        this.todoItemService.updateTodoItem(item_id, content)
-            .then(()=>{
+        if (!content)
+            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
 
-            })
-            .catch(err => {
-                throw new HttpException('Не удалось обновить todo', HttpStatus.BAD_REQUEST);
-            })
+        const item = await this.todoItemService.getItem(item_id);
+
+        if (!this.hasAccess(request?.user, item))
+            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+
+        response.status(HttpStatus.NO_CONTENT);
+        await this.todoItemService.changeContentTodoItem(item, content)
     }
+
 
     @Delete('/:item_id')
-    deleteTodoItem(@Param('item_id') item_id: number)
+    async deleteTodoItem(
+        @Param('item_id') item_id: number,
+        @Req() request: IRequestWithUserAuth,
+        @Res({ passthrough: true }) response: Response): Promise<void>
     {
-        this.todoItemService.removeItem(item_id)
-            .then(()=>{})
-            .catch(err => {
-                throw new HttpException('Не удалось удалить todo', HttpStatus.BAD_REQUEST);
-            })
+        const item = await this.todoItemService.getItem(item_id);
+
+        if (!this.hasAccess(request?.user, item))
+            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+
+        response.status(HttpStatus.NO_CONTENT);
+        return this.todoItemService.removeItem(item);
     }
 }
