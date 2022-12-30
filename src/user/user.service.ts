@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {UserEntity} from './user.entity';
@@ -34,6 +34,9 @@ export class UserService{
 	getUser(id: number): Promise<UserEntity>
 	{
 		return this.userEntityRepository.findOneByOrFail({id})
+			.catch( _ => {
+				throw new NotFoundException();
+			})
 	}
 
 	isValidUser(user: UserEntity, token: string): boolean

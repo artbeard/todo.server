@@ -9,7 +9,7 @@ import {
     Post,
     Delete,
     Put,
-    UseGuards, Res
+    UseGuards, Res, ForbiddenException
 } from '@nestjs/common';
 import { CheckAccess } from "../check-auth/check-access";
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
@@ -53,7 +53,8 @@ export class TodoController extends CheckAccess{
             throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
 
         if (!this.hasAccess(request?.user, list))
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new ForbiddenException();
+            //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
 
         const newItem = await this.todoItemService.createNewTodoItem(todoItemData, list);
 
@@ -77,7 +78,8 @@ export class TodoController extends CheckAccess{
         const item = await this.todoItemService.getItem(item_id);
 
         if (!this.hasAccess(request?.user, item))
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new ForbiddenException();
+            //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
 
         response.status(HttpStatus.NO_CONTENT);
         await this.todoItemService.setCompleted(item, !!completed)
@@ -103,7 +105,8 @@ export class TodoController extends CheckAccess{
         const item = await this.todoItemService.getItem(item_id);
 
         if (!this.hasAccess(request?.user, item))
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new ForbiddenException();
+            //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
 
         response.status(HttpStatus.NO_CONTENT);
         await this.todoItemService.changeContentTodoItem(item, content)
@@ -119,7 +122,8 @@ export class TodoController extends CheckAccess{
         const item = await this.todoItemService.getItem(item_id);
 
         if (!this.hasAccess(request?.user, item))
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new ForbiddenException();
+            //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
 
         response.status(HttpStatus.NO_CONTENT);
         return this.todoItemService.removeItem(item);

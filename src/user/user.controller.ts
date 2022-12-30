@@ -1,4 +1,16 @@
-import {Controller, Body, Req, Res, Post, Get, Param, HttpException, HttpStatus, UseGuards} from '@nestjs/common';
+import {
+    Controller,
+    Body,
+    Req,
+    Res,
+    Post,
+    Get,
+    Param,
+    HttpException,
+    HttpStatus,
+    BadRequestException,
+    UseGuards,
+} from '@nestjs/common';
 import { IRequestWithUserAuth, IUserDto } from "../use/interfaces";
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
 import { Request, Response } from 'express';
@@ -26,7 +38,8 @@ export class UserController {
         const user = await this.userService.getUser(request?.user.id);
         if (!user || !this.userService.isValidUser(user, request.cookies?.token))
         {
-            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+            //throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException();
         }
         response
             .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})
@@ -56,7 +69,8 @@ export class UserController {
             response
                 .cookie('uid', 0, {maxAge: -1000})
                 .cookie('token', 0, {maxAge: -1000})
-            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+            //throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException();
         }
 
         response
@@ -76,7 +90,10 @@ export class UserController {
         @Res({ passthrough: true }) response: Response): Promise<UserEntity>
     {
         if (!name)
-            throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+        {
+            //throw new HttpException('Неверный запрос', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException();
+        }
         const user = await this.userService.createNewUser({name});
         response
             .cookie('uid', user.id, {maxAge: 1000 * 60 * 60 * 24 * 365})

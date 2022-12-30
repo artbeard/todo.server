@@ -10,7 +10,7 @@ import {
     Res,
     UseGuards,
     HttpException,
-    HttpStatus
+    HttpStatus, ForbiddenException
 } from '@nestjs/common';
 import { CheckAccess } from "../check-auth/check-access";
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
@@ -54,7 +54,8 @@ export class TodoListController extends CheckAccess{
         const list = await this.todoListService.findOne(list_id);
         if (!this.hasAccess(request.user, list))
         {
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new ForbiddenException();
         }
         return list;
     }
@@ -98,7 +99,8 @@ export class TodoListController extends CheckAccess{
 
         if (!this.hasAccess(request?.user, list))
         {
-            throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
+            throw new ForbiddenException();
+            //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN);
         }
 
         list.title = title;
@@ -124,7 +126,8 @@ export class TodoListController extends CheckAccess{
             {
                 if (!this.hasAccess(request?.user, list))
                 {
-                    throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN)
+                    //throw new HttpException('Доступ запрещен', HttpStatus.FORBIDDEN)
+                    throw new ForbiddenException();
                 }
                 await this.todoListService.removeList(list);
             }
