@@ -3,13 +3,13 @@ import {
     Body,
     Param,
     Req,
+    ForbiddenException,
     HttpException,
     HttpStatus,
     Patch,
     Post,
     Delete,
-    Put,
-    UseGuards, Res, ForbiddenException
+    UseGuards, Res,
 } from '@nestjs/common';
 import { CheckAccess } from "../check-auth/check-access";
 import { CheckAuthGuard } from '../check-auth/check-auth.guard'
