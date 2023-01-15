@@ -63,10 +63,13 @@ export class AppController {
     /**
      * Страница SPA приложения
      */
-    @Get('/todo')
+    //@Get('todo[a-z0-9\/]*') //не работает
+    @Get('todo[a-z0-9\/]{0,}')
     @Render('page/todo-content')
     action_todo() {
-        return {};
+        return {
+            title: 'Мои дела'
+        };
     }
 
 
